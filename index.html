@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Baloncuk Patlatma 🎈</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:#1a0533;overflow:hidden;font-family:'Nunito',sans-serif;color:#fff;width:100vw;height:100vh;}
+#wrap{position:relative;width:100vw;height:100vh;}
+
+/* VIDEO BACKGROUND */
+#vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.22;}
+
+/* GAME CANVAS */
+#gc{position:absolute;inset:0;width:100%;height:100%;}
+
+/* HUD */
+#hud{position:absolute;top:0;left:0;right:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:linear-gradient(180deg,rgba(0,0,0,0.65) 0%,transparent 100%);pointer-events:none;}
+.hud-item{font-family:'Fredoka One',cursive;font-size:clamp(1.2rem,4vw,2rem);text-shadow:0 2px 8px rgba(0,0,0,0.8);}
+#h-score{color:#ffe066;}
+#h-level{color:#7efff5;}
+#h-timer{color:#ff6eb4;}
+#h-goal{position:absolute;top:60px;left:50%;transform:translateX(-50%);font-family:'Fredoka One',cursive;font-size:clamp(0.8rem,2.5vw,1.1rem);color:rgba(255,255,255,0.7);white-space:nowrap;pointer-events:none;}
+
+/* TOOLBAR */
+#toolbar{position:absolute;bottom:16px;right:16px;z-index:20;display:flex;flex-direction:column;gap:8px;}
+.tool-btn{width:48px;height:48px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.5);color:#fff;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.tool-btn:active{transform:scale(0.9);}
+
+/* FINGER DOT */
+#dot{position:absolute;width:40px;height:40px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.95) 0%,rgba(126,255,245,0.7) 50%,transparent 100%);box-shadow:0 0 24px rgba(126,255,245,0.9);transform:translate(-50%,-50%);pointer-events:none;z-index:15;display:none;}
+
+/* SCREENS */
+.screen{position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(15,5,40,0.97),rgba(40,20,90,0.97));padding:20px;text-align:center;}
+.screen h1{font-family:'Fredoka One',cursive;font-size:clamp(2.2rem,7vw,4.5rem);background:linear-gradient(90deg,#ffe066,#ff6eb4,#7efff5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;margin-bottom:10px;animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{filter:brightness(1);}50%{filter:brightness(1.3);}}
+.screen p{color:#b0aed0;font-size:clamp(0.9rem,2.5vw,1.2rem);margin-bottom:20px;line-height:1.5;}
+.box{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:18px;padding:16px 22px;margin-bottom:20px;width:100%;max-width:440px;}
+.box h3{font-family:'Fredoka One',cursive;color:#ffe066;font-size:1.1rem;margin-bottom:10px;}
+.box li{list-style:none;color:#d0cef0;margin:6px 0;font-size:0.95rem;display:flex;align-items:center;gap:8px;}
+.big-btn{font-family:'Fredoka One',cursive;font-size:clamp(1.3rem,4vw,1.8rem);padding:14px 50px;background:linear-gradient(135deg,#ff6eb4,#ff3d9a);border:none;border-radius:50px;color:#fff;cursor:pointer;box-shadow:0 6px 24px rgba(255,61,154,0.5);animation:btn-pulse 2s infinite;margin-top:8px;}
+@keyframes btn-pulse{0%,100%{box-shadow:0 6px 24px rgba(255,61,154,0.5),0 0 0 0 rgba(255,61,154,0.3);}50%{box-shadow:0 6px 24px rgba(255,61,154,0.5),0 0 0 14px rgba(255,61,154,0);}}
+.big-btn:active{transform:scale(0.96);}
+#cam-status{font-size:0.9rem;color:#7efff5;margin-top:10px;min-height:20px;}
+
+/* END SCREEN */
+#end-screen{display:none;}
+#final-score{font-family:'Fredoka One',cursive;font-size:clamp(4rem,12vw,8rem);background:linear-gradient(90deg,#ff6eb4,#ffe066);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+#rank{font-size:clamp(1rem,3vw,1.4rem);color:#7efff5;margin:8px 0 20px;}
+.restart-btn{font-family:'Fredoka One',cursive;font-size:1.4rem;padding:12px 44px;background:linear-gradient(135deg,#7efff5,#00bcd4);border:none;border-radius:50px;color:#1a0533;cursor:pointer;margin-top:6px;}
+
+/* EASTER EGG OVERLAY */
+#egg-overlay{position:absolute;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(255,100,0,0.97),rgba(200,0,100,0.97));animation:egg-in 0.4s ease;}
+@keyframes egg-in{from{transform:scale(0.5);opacity:0;}to{transform:scale(1);opacity:1;}}
+#egg-overlay h2{font-family:'Fredoka One',cursive;font-size:clamp(2rem,8vw,5rem);color:#ffe066;text-shadow:0 0 40px #ff6600;margin-bottom:10px;}
+#egg-overlay p{font-size:clamp(1rem,3vw,1.5rem);color:#fff;margin-bottom:30px;}
+
+/* BOMB ALERT */
+#bomb-alert{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Fredoka One',cursive;font-size:clamp(1.5rem,5vw,3rem);color:#ff4444;text-shadow:0 0 20px #ff0000;pointer-events:none;z-index:25;display:none;animation:flash 0.5s ease;}
+@keyframes flash{0%{opacity:0;transform:translate(-50%,-50%) scale(0.5);}50%{opacity:1;transform:translate(-50%,-50%) scale(1.2);}100%{opacity:0;transform:translate(-50%,-50%) scale(1);}}
+
+#loading{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-size:0.85rem;color:rgba(255,255,255,0.4);z-index:25;}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <video id="vid" playsinline autoplay muted></video>
+  <canvas id="gc"></canvas>
+
+  <div id="hud">
+    <div class="hud-item" id="h-score">⭐ <span id="sc">0</span></div>
+    <div class="hud-item" id="h-level">Lv.<span id="lv">1</span></div>
+    <div class="hud-item" id="h-timer">⏱<span id="tm">60</span>s</div>
+  </div>
+  <div id="h-goal">🎯 Hedef: <span id="goal-txt">30 balon patlat → 🍫 Çikolata!</span></div>
+
+  <div id="dot"></div>
+  <div id="bomb-alert">💥 BOMBA! Puan Silindi!</div>
+
+  <!-- TOOLBAR -->
+  <div id="toolbar">
+    <button class="tool-btn" id="btn-mirror" title="Aynala">🔄</button>
+    <button class="tool-btn" id="btn-fs" title="Tam Ekran">⛶</button>
+  </div>
+
+  <!-- START SCREEN -->
+  <div class="screen" id="start-screen">
+    <h1>🎈 Baloncuk<br>Patlatma!</h1>
+    <p>Parmağınla balonları patlat!<br>Ekrana dokunmana gerek yok ✨</p>
+    <div class="box">
+      <h3>📋 Nasıl Oynanır?</h3>
+      <ul>
+        <li>👆 İşaret parmağını kameraya göster</li>
+        <li>🎈 Parmağını balonun üzerine getir → patlar!</li>
+        <li>💣 Bombaya dokunma → puan sıfırlanır!</li>
+        <li>🌈 Gökkuşağı balona dikkat → gizli ödül!</li>
+        <li>🍫 60sn'de 30 balon patlat → Çikolata kazan!</li>
+      </ul>
+    </div>
+    <button class="big-btn" id="start-btn">🚀 Oyuna Başla!</button>
+    <div id="cam-status">📷 Kamera bağlanıyor...</div>
+  </div>
+
+  <!-- END SCREEN -->
+  <div class="screen" id="end-screen">
+    <h1 style="font-size:clamp(1.8rem,5vw,3rem)">🎉 Süre Doldu!</h1>
+    <div id="final-score">0</div>
+    <div id="rank"></div>
+    <div id="goal-result" style="font-size:1.1rem;margin-bottom:16px;"></div>
+    <button class="restart-btn" onclick="restartGame()">🔄 Tekrar Oyna</button>
+  </div>
+
+  <!-- EASTER EGG -->
+  <div id="egg-overlay">
+    <h2>🍫 TEBRİKLER!</h2>
+    <p id="egg-msg">30 balon patlatttın!<br>Öğretmenden çikolatanı al! 🎁</p>
+    <button class="restart-btn" onclick="closeEgg()">🎮 Devam Et</button>
+  </div>
+
+  <div id="loading">Yükleniyor...</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+<script>
+// ─── STATE ───────────────────────────────────────────────
+const GOAL = 30; // balon hedefi
+const BOMB_INTERVAL = 10000; // ms
+const GAME_TIME = 60;
+
+let score = 0, popped = 0, timeLeft = GAME_TIME, level = 1;
+let gameActive = false, timerInterval = null;
+let fx = -1, fy = -1, lastPop = 0;
+let handsReady = false;
+let mirrored = false; // başlangıç: aynasız (selfieMode=true ile koordinatlar doğru gelir)
+let goalDone = false;
+let bubbles = [], particles = [], floaters = [], bombs = [];
+let bombTimer = null;
+
+const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+
+// ─── CANVAS ──────────────────────────────────────────────
+const vid = document.getElementById('vid');
+const gc = document.getElementById('gc');
+const ctx = gc.getContext('2d');
+const dot = document.getElementById('dot');
+
+function resize() {
+  gc.width = window.innerWidth;
+  gc.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', () => { resize(); });
+
+// ─── MIRROR BUTTON ───────────────────────────────────────
+document.getElementById('btn-mirror').onclick = () => {
+  mirrored = !mirrored;
+  vid.style.transform = mirrored ? '' : 'scaleX(-1)';
+  gc.style.transform = mirrored ? '' : 'scaleX(-1)';
+  document.getElementById('btn-mirror').textContent = mirrored ? '↔️' : '🔄';
+};
+// default: video ve canvas aynalı (daha doğal görünüm)
+vid.style.transform = 'scaleX(-1)';
+gc.style.transform = 'scaleX(-1)';
+
+// ─── FULLSCREEN ──────────────────────────────────────────
+document.getElementById('btn-fs').onclick = () => {
+  const el = document.documentElement;
+  if (!document.fullscreenElement) {
+    el.requestFullscreen && el.requestFullscreen();
+  } else {
+    document.exitFullscreen && document.exitFullscreen();
+  }
+};
+
+// ─── COLORS ──────────────────────────────────────────────
+const COLORS = [
+  {fill:'rgba(255,110,180,0.8)',glow:'#ff3d9a',pts:1},
+  {fill:'rgba(126,255,245,0.8)',glow:'#00bcd4',pts:1},
+  {fill:'rgba(255,224,102,0.8)',glow:'#ffb300',pts:2},
+  {fill:'rgba(150,130,255,0.8)',glow:'#7c4dff',pts:1},
+  {fill:'rgba(100,255,150,0.8)',glow:'#00e676',pts:2},
+  {fill:'rgba(255,160,80,0.8)', glow:'#ff6d00',pts:3},
+];
+const RAINBOW = {fill:'rgba(255,255,255,0.9)',glow:'#ffffff',pts:5,rainbow:true};
+
+// ─── BUBBLE ──────────────────────────────────────────────
+class Bubble {
+  constructor(isRainbow=false) {
+    this.isRainbow = isRainbow;
+    this.reset(true);
+  }
+  reset(init=false) {
+    const m = 60;
+    this.r = 28 + Math.random() * 38;
+    this.x = m + Math.random() * (window.innerWidth - m*2);
+    this.y = init ? Math.random()*window.innerHeight : window.innerHeight + this.r + Math.random()*150;
+    if (this.isRainbow) {
+      this.col = RAINBOW;
+      this.hue = 0;
+    } else {
+      this.col = COLORS[Math.floor(Math.random()*COLORS.length)];
+    }
+    this.speed = (0.7 + Math.random()*1.1) * (1 + (level-1)*0.12);
+    this.drift = (Math.random()-0.5)*0.5;
+    this.wobble = Math.random()*Math.PI*2;
+    this.ws = 0.025 + Math.random()*0.025;
+    this.popped = false;
+    this.opacity = 1;
+  }
+  update() {
+    this.y -= this.speed;
+    this.x += this.drift;
+    this.wobble += this.ws;
+    if (this.isRainbow) this.hue = (this.hue + 2) % 360;
+    if (this.y < -this.r*2) this.reset();
+  }
+  draw() {
+    if (this.popped) return;
+    const wx = this.x + Math.sin(this.wobble)*3;
+    ctx.save();
+    if (this.isRainbow) {
+      ctx.shadowBlur = 30;
+      ctx.shadowColor = `hsl(${this.hue},100%,60%)`;
+      const g = ctx.createRadialGradient(wx-this.r*0.3,this.y-this.r*0.3,this.r*0.1,wx,this.y,this.r);
+      g.addColorStop(0,'rgba(255,255,255,0.9)');
+      g.addColorStop(0.4,`hsla(${this.hue},100%,70%,0.85)`);
+      g.addColorStop(1,`hsla(${(this.hue+60)%360},100%,50%,0.4)`);
+      ctx.beginPath(); ctx.arc(wx,this.y,this.r,0,Math.PI*2);
+      ctx.fillStyle=g; ctx.fill();
+      // rainbow border
+      ctx.beginPath(); ctx.arc(wx,this.y,this.r,0,Math.PI*2);
+      ctx.strokeStyle=`hsl(${this.hue},100%,70%)`; ctx.lineWidth=3; ctx.stroke();
+      ctx.font=`bold ${this.r*0.55}px Fredoka One,cursive`;
+      ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.shadowBlur=0;
+      ctx.fillText('🌈', wx, this.y);
+    } else {
+      ctx.shadowBlur=18; ctx.shadowColor=this.col.glow;
+      const g = ctx.createRadialGradient(wx-this.r*0.3,this.y-this.r*0.3,this.r*0.1,wx,this.y,this.r);
+      g.addColorStop(0,'rgba(255,255,255,0.65)');
+      g.addColorStop(0.4,this.col.fill);
+      g.addColorStop(1,this.col.fill.replace('0.8','0.25'));
+      ctx.beginPath(); ctx.arc(wx,this.y,this.r,0,Math.PI*2);
+      ctx.fillStyle=g; ctx.fill();
+      ctx.shadowBlur=0;
+      ctx.beginPath(); ctx.arc(wx-this.r*0.28,this.y-this.r*0.28,this.r*0.2,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.fill();
+      ctx.beginPath(); ctx.arc(wx,this.y,this.r,0,Math.PI*2);
+      ctx.strokeStyle='rgba(255,255,255,0.25)'; ctx.lineWidth=2; ctx.stroke();
+      if (this.col.pts>1) {
+        ctx.font=`bold ${this.r*0.52}px Fredoka One,cursive`;
+        ctx.fillStyle='rgba(255,255,255,0.95)';
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText('+'+this.col.pts, wx, this.y);
+      }
+    }
+    ctx.restore();
+  }
+  hit(px,py) {
+    if (this.popped) return false;
+    const wx = this.x + Math.sin(this.wobble)*3;
+    return Math.hypot(px-wx, py-this.y) < this.r+14;
+  }
+}
+
+// ─── BOMB ─────────────────────────────────────────────────
+class Bomb {
+  constructor() {
+    const m = 80;
+    this.r = 32;
+    this.x = m + Math.random()*(window.innerWidth-m*2);
+    this.y = window.innerHeight + this.r;
+    this.speed = 1.2 + Math.random()*0.8;
+    this.wobble = Math.random()*Math.PI*2;
+    this.ws = 0.02;
+    this.life = 1;
+    this.popped = false;
+    this.tickTimer = 0;
+  }
+  update() {
+    this.y -= this.speed;
+    this.wobble += this.ws;
+    this.tickTimer++;
+    if (this.y < -this.r*2) this.popped = true;
+  }
+  draw() {
+    if (this.popped) return;
+    const wx = this.x + Math.sin(this.wobble)*3;
+    const pulse = 0.85 + Math.sin(this.tickTimer*0.15)*0.15;
+    ctx.save();
+    ctx.shadowBlur = 25*pulse;
+    ctx.shadowColor = '#ff0000';
+    ctx.font = `${this.r*1.8*pulse}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('💣', wx, this.y);
+    ctx.restore();
+  }
+  hit(px,py) {
+    if (this.popped) return false;
+    const wx = this.x + Math.sin(this.wobble)*3;
+    return Math.hypot(px-wx, py-this.y) < this.r+10;
+  }
+}
+
+// ─── PARTICLES ───────────────────────────────────────────
+class Particle {
+  constructor(x,y,color) {
+    this.x=x; this.y=y; this.color=color;
+    const a=Math.random()*Math.PI*2, s=4+Math.random()*8;
+    this.vx=Math.cos(a)*s; this.vy=Math.sin(a)*s;
+    this.life=1; this.decay=0.04+Math.random()*0.04;
+    this.r=3+Math.random()*6;
+  }
+  update(){this.x+=this.vx;this.y+=this.vy;this.vy+=0.2;this.life-=this.decay;}
+  draw(){ctx.save();ctx.globalAlpha=this.life;ctx.beginPath();ctx.arc(this.x,this.y,this.r*this.life,0,Math.PI*2);ctx.fillStyle=this.color;ctx.fill();ctx.restore();}
+}
+
+class Floater {
+  constructor(x,y,text,color='#ffe066'){this.x=x;this.y=y;this.text=text;this.color=color;this.life=1;this.decay=0.022;}
+  update(){this.y-=2.5;this.life-=this.decay;}
+  draw(){ctx.save();ctx.globalAlpha=this.life;ctx.font='bold clamp(1.5rem,4vw,2rem) Fredoka One,cursive';ctx.font='bold 1.8rem Fredoka One,cursive';ctx.fillStyle=this.color;ctx.strokeStyle='rgba(0,0,0,0.6)';ctx.lineWidth=4;ctx.textAlign='center';ctx.strokeText(this.text,this.x,this.y);ctx.fillText(this.text,this.x,this.y);ctx.restore();}
+}
+
+// ─── INIT ─────────────────────────────────────────────────
+function initBubbles() {
+  bubbles = [];
+  bombs = [];
+  const cnt = isMobile ? 5+level : 7+level*2;
+  for (let i=0;i<cnt;i++) {
+    const b = new Bubble();
+    b.y = Math.random()*window.innerHeight;
+    bubbles.push(b);
+  }
+  // 1 rainbow bubble always
+  const rb = new Bubble(true);
+  rb.y = Math.random()*window.innerHeight;
+  bubbles.push(rb);
+}
+
+// ─── GAME LOOP ────────────────────────────────────────────
+function loop() {
+  if (!gameActive) return;
+  ctx.clearRect(0,0,gc.width,gc.height);
+
+  // bubbles
+  for (const b of bubbles) { b.update(); b.draw(); }
+  // bombs
+  for (const b of bombs) { b.update(); b.draw(); }
+  bombs = bombs.filter(b=>!b.popped);
+
+  // hit detection
+  if (fx>0 && fy>0) {
+    const now = Date.now();
+    for (const b of bubbles) {
+      if (!b.popped && b.hit(fx,fy) && now-lastPop>90) {
+        lastPop = now;
+        b.popped = true;
+        const pts = b.col.pts;
+        score += pts; popped++;
+        document.getElementById('sc').textContent = score;
+        playPop();
+        const color = b.isRainbow ? `hsl(${Math.random()*360},100%,60%)` : b.col.glow;
+        const pc = isMobile ? 8 : 14;
+        for (let i=0;i<pc;i++) particles.push(new Particle(b.x,b.y,color));
+        floaters.push(new Floater(b.x,b.y-b.r, b.isRainbow?'+5 🌈':'+'+pts, b.isRainbow?'#fff':'#ffe066'));
+
+        // rainbow easter egg
+        if (b.isRainbow) {
+          setTimeout(()=>{
+            floaters.push(new Floater(window.innerWidth/2, window.innerHeight/2, '🌈 GİZLİ BALON! +5', '#fff'));
+          }, 200);
+        }
+
+        // goal check
+        if (popped >= GOAL && !goalDone) {
+          goalDone = true;
+          showEasterEgg();
+        }
+
+        // level up
+        const nl = Math.floor(score/25)+1;
+        if (nl>level) {
+          level=nl;
+          document.getElementById('lv').textContent=level;
+          if (bubbles.filter(x=>!x.isRainbow).length < 20) bubbles.push(new Bubble());
+        }
+
+        setTimeout(()=>{ b.reset(); b.popped=false; }, 80);
+      }
+    }
+
+    // bomb hit
+    for (const b of bombs) {
+      if (!b.popped && b.hit(fx,fy)) {
+        b.popped = true;
+        score = 0;
+        document.getElementById('sc').textContent = '0';
+        showBombAlert();
+        playBoom();
+        for (let i=0;i<20;i++) particles.push(new Particle(b.x,b.y,'#ff4400'));
+        floaters.push(new Floater(b.x,b.y-b.r,'💥 PUAN SİFIR!','#ff4444'));
+      }
+    }
+  }
+
+  // particles & floaters
+  particles = particles.filter(p=>p.life>0);
+  for (const p of particles) { p.update(); p.draw(); }
+  floaters = floaters.filter(f=>f.life>0);
+  for (const f of floaters) { f.update(); f.draw(); }
+
+  // finger glow
+  if (fx>0) {
+    ctx.save();
+    const g=ctx.createRadialGradient(fx,fy,0,fx,fy,28);
+    g.addColorStop(0,'rgba(126,255,245,0.85)');
+    g.addColorStop(1,'rgba(126,255,245,0)');
+    ctx.beginPath(); ctx.arc(fx,fy,28,0,Math.PI*2);
+    ctx.fillStyle=g; ctx.fill();
+    ctx.restore();
+  }
+
+  requestAnimationFrame(loop);
+}
+
+// ─── BOMB SPAWNER ─────────────────────────────────────────
+function spawnBomb() {
+  if (!gameActive) return;
+  bombs.push(new Bomb());
+  bombTimer = setTimeout(spawnBomb, BOMB_INTERVAL);
+}
+
+function showBombAlert() {
+  const el = document.getElementById('bomb-alert');
+  el.style.display = 'block';
+  setTimeout(()=>{ el.style.display='none'; }, 1200);
+}
+
+// ─── EASTER EGG ───────────────────────────────────────────
+function showEasterEgg() {
+  const ov = document.getElementById('egg-overlay');
+  document.getElementById('egg-msg').textContent = `${GOAL} balon patlattın!\nÖğretmenden çikolatanı al! 🎁`;
+  ov.style.display = 'flex';
+}
+function closeEgg() {
+  document.getElementById('egg-overlay').style.display='none';
+}
+
+// ─── AUDIO ────────────────────────────────────────────────
+let actx = null;
+function getACtx() { if (!actx) actx=new(window.AudioContext||window.webkitAudioContext)(); return actx; }
+function playPop() {
+  try {
+    const a=getACtx(), o=a.createOscillator(), g=a.createGain();
+    o.connect(g); g.connect(a.destination);
+    o.type='sine';
+    o.frequency.setValueAtTime(500+Math.random()*500,a.currentTime);
+    o.frequency.exponentialRampToValueAtTime(150,a.currentTime+0.12);
+    g.gain.setValueAtTime(0.25,a.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+0.12);
+    o.start(); o.stop(a.currentTime+0.12);
+  } catch(e){}
+}
+function playBoom() {
+  try {
+    const a=getACtx(), buf=a.createBuffer(1,a.sampleRate*0.4,a.sampleRate);
+    const d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
+    const s=a.createBufferSource(), g=a.createGain();
+    s.buffer=buf; s.connect(g); g.connect(a.destination);
+    g.gain.setValueAtTime(0.5,a.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+0.4);
+    s.start();
+  } catch(e){}
+}
+
+// ─── MEDIAPIPE ────────────────────────────────────────────
+let hands=null, mpCam=null;
+function setupMP() {
+  hands = new Hands({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
+  hands.setOptions({maxNumHands:1,modelComplexity:0,minDetectionConfidence:0.55,minTrackingConfidence:0.45,selfieMode:false});
+  let fc=0;
+  hands.onResults(r=>{
+    handsReady=true;
+    document.getElementById('loading').style.display='none';
+    document.getElementById('cam-status').textContent='✅ Kamera hazır!';
+    if (!gameActive) return;
+    if (r.multiHandLandmarks && r.multiHandLandmarks.length>0) {
+      const t=r.multiHandLandmarks[0][8];
+      // selfieMode=false → coordinates are raw, need to mirror for front cam
+      fx = (1-t.x)*window.innerWidth;
+      fy = t.y*window.innerHeight;
+      dot.style.left=fx+'px'; dot.style.top=fy+'px'; dot.style.display='block';
+    } else {
+      fx=-1; fy=-1; dot.style.display='none';
+    }
+  });
+  mpCam = new Camera(vid,{
+    onFrame: async()=>{
+      fc++;
+      if (isMobile && fc%2!==0) return;
+      await hands.send({image:vid});
+    },
+    width: isMobile?320:640, height: isMobile?240:480
+  });
+  mpCam.start()
+    .then(()=>{ document.getElementById('cam-status').textContent='🔄 Model yükleniyor...'; })
+    .catch(()=>{ document.getElementById('cam-status').textContent='❌ Kamera izni ver!'; });
+}
+
+// ─── GAME CONTROL ─────────────────────────────────────────
+function startGame() {
+  if (!handsReady) { document.getElementById('cam-status').textContent='⏳ Biraz bekle...'; return; }
+  score=0; popped=0; timeLeft=GAME_TIME; level=1; goalDone=false;
+  document.getElementById('sc').textContent='0';
+  document.getElementById('tm').textContent=GAME_TIME;
+  document.getElementById('lv').textContent='1';
+  document.getElementById('goal-txt').textContent=`${GOAL} balon patlat → 🍫 Çikolata!`;
+  particles=[]; floaters=[]; bubbles=[];
+  gameActive=true;
+  document.getElementById('start-screen').style.display='none';
+  document.getElementById('end-screen').style.display='none';
+  document.getElementById('egg-overlay').style.display='none';
+  initBubbles();
+  loop();
+  bombTimer = setTimeout(spawnBomb, BOMB_INTERVAL);
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    document.getElementById('tm').textContent=timeLeft;
+    if (timeLeft<=10) document.getElementById('h-timer').style.color='#ff4444';
+    if (timeLeft<=0) { clearInterval(timerInterval); clearTimeout(bombTimer); endGame(); }
+  },1000);
+}
+
+function endGame() {
+  gameActive=false; fx=-1; fy=-1; dot.style.display='none';
+  document.getElementById('final-score').textContent=score;
+  const ranks=['🌱 Başlangıç!','⭐ İyi!','🌟 Harika!','💫 Süper!','🏆 EFSANEVİ!'];
+  const ri = Math.min(Math.floor(score/15), ranks.length-1);
+  document.getElementById('rank').textContent=ranks[ri];
+  const gr = document.getElementById('goal-result');
+  if (goalDone) { gr.innerHTML='🍫 <strong>Çikolata Kazandın!</strong> Tebrikler!'; gr.style.color='#ffe066'; }
+  else { gr.textContent=`Hedefe ${GOAL-popped} balon kaldı! Tekrar dene 💪`; gr.style.color='#ff6eb4'; }
+  document.getElementById('end-screen').style.display='flex';
+}
+
+function restartGame() {
+  document.getElementById('h-timer').style.color='#ff6eb4';
+  document.getElementById('end-screen').style.display='none';
+  startGame();
+}
+
+document.getElementById('start-btn').onclick = startGame;
+window.addEventListener('load',()=>{ setTimeout(setupMP,500); });
+</script>
+</body>
+</html>
