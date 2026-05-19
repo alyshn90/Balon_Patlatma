@@ -344,7 +344,7 @@ html,body{ width:100%; height:100%; overflow:hidden; background:var(--purple-dar
 
 <!-- SAĞ ÜST BUTONLAR — ANA SAYFA -->
 <div id="start-top">
-  <button class="icon-btn" id="start-cam-btn" title="Kamera Aç/Kapat">📷</button>
+  <!-- <button class="icon-btn" id="start-cam-btn" title="Kamera Aç/Kapat">📷</button> -->
   <button class="icon-btn" id="start-fs-btn" title="Tam Ekran">⛶</button>
 </div>
 
@@ -405,7 +405,7 @@ html,body{ width:100%; height:100%; overflow:hidden; background:var(--purple-dar
   <div class="hud-pill" id="h-lv">Lv.<span id="lv">1</span></div>
   <div class="hud-pill" id="h-tm">⏱<span id="tm">60</span>s</div>
   <div id="hud-right">
-    <button class="icon-btn" id="hud-cam-btn" title="Kamera">📷</button>
+    <!-- <button class="icon-btn" id="hud-cam-btn" title="Kamera">📷</button> -->
     <button class="icon-btn" id="hud-fs-btn" title="Tam Ekran">⛶</button>
   </div>
 </div>
@@ -735,10 +735,10 @@ function gameSketch(p){
 
   // Saniyeye göre hız ve spawn çarpanı
   function getTimeMult(){
-    if(timeLeft>45) return 1.00;
-    if(timeLeft>30) return 1.25;
-    if(timeLeft>15) return 1.50;
-    return 1.75;
+    if(timeLeft>45) return 1.50;
+    if(timeLeft>30) return 1.75;
+    if(timeLeft>15) return 2.00;
+    return 2.50;
   }
 
   // Aktif balon sayısı üst limiti
@@ -888,7 +888,8 @@ function gameSketch(p){
         this.x=p.random(this.rBase+18,p.width-this.rBase-18);
         this.y=p.height+this.rBase+8;
         const tm=getTimeMult();
-        this.speed=p.random(D.speedMin*tm, D.speedMax*tm);
+        const lm=1+(level-1)*.08;
+this.speed=p.random(D.speedMin*(tm*.7)*lm, D.speedMax*(tm*.7)*lm);
         this.drift=(p.random()-.5)*.75;
 
         const roll=p.random();
