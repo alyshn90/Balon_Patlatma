@@ -815,7 +815,7 @@ function gameSketch(p){
       balloons.push(new Balloon(false));
     }
     // Big Boss spawn (son 15sn, çok nadir)
-    if(timeLeft<=15 && p.random()<.003){
+    if(timeLeft<=15 && p.random()<(selectedDiff==='hard'?.008:selectedDiff==='medium'?.005:.003)){
       balloons.push(new Balloon(true));
     }
 
