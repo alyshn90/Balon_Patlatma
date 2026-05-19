@@ -5,54 +5,128 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Baloncuk Patlatma 🎈</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:100%;height:100%;overflow:hidden;background:#1a0533;font-family:'Nunito',sans-serif;color:#fff;}
 #wrap{position:fixed;inset:0;}
-
-/* Video aynalı görünsün ama canvas aynasız kalsın */
 #vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.2;transform:scaleX(-1);}
-#gc{position:absolute;inset:0;width:100%;height:100%;} /* ASLA transform ekleme */
+#gc{position:absolute;inset:0;width:100%;height:100%;}
 
-#hud{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:linear-gradient(180deg,rgba(0,0,0,0.72) 0%,transparent 100%);pointer-events:none;z-index:10;min-height:56px;}
-.hi{font-family:'Fredoka One',cursive;font-size:clamp(1.2rem,4.5vw,1.9rem);text-shadow:0 2px 8px rgba(0,0,0,0.9);}
-#h-sc{color:#ffe066;}#h-lv{color:#7efff5;}#h-tm{color:#ff6eb4;}
-#h-goal{position:absolute;top:56px;left:0;right:0;text-align:center;font-family:'Fredoka One',cursive;font-size:clamp(0.72rem,2.2vw,0.95rem);color:rgba(255,255,255,0.8);pointer-events:none;z-index:10;text-shadow:0 1px 6px rgba(0,0,0,0.9);}
+/* HUD */
+#hud{
+  position:absolute;top:0;left:0;right:0;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 16px;
+  background:linear-gradient(180deg,rgba(0,0,0,0.75) 0%,transparent 100%);
+  pointer-events:none;z-index:10;
+}
+.hi{font-family:'Baloo 2',cursive;font-size:clamp(1.2rem,4vw,1.8rem);text-shadow:0 2px 8px rgba(0,0,0,0.9);}
+#h-sc{color:#ffe066;}
+#h-lv{color:#7efff5;}
+#h-tm-wrap{display:flex;align-items:center;gap:8px;pointer-events:all;}
+#h-tm{color:#ff6eb4;}
+#btn-fs{
+  width:36px;height:36px;border-radius:50%;
+  border:2px solid rgba(255,255,255,0.3);
+  background:rgba(0,0,0,0.5);
+  color:#fff;font-size:1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:all;
+}
+#btn-fs:active{transform:scale(0.88);}
 
-#toolbar{position:absolute;bottom:18px;right:14px;z-index:20;display:flex;flex-direction:column;gap:9px;}
-.tbtn{width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.55);color:#fff;font-size:1.15rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-.tbtn:active{transform:scale(0.88);}
+#h-goal{
+  position:absolute;top:52px;left:0;right:0;text-align:center;
+  font-family:'Baloo 2',cursive;font-size:clamp(0.7rem,2vw,0.9rem);
+  color:rgba(255,255,255,0.8);pointer-events:none;z-index:10;
+  text-shadow:0 1px 6px rgba(0,0,0,0.9);
+}
 
-#dot{position:absolute;width:36px;height:36px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.95) 0%,rgba(126,255,245,0.6) 55%,transparent 100%);box-shadow:0 0 22px rgba(126,255,245,0.9);transform:translate(-50%,-50%);pointer-events:none;z-index:15;display:none;}
+/* FINGER DOT */
+#dot{
+  position:absolute;width:36px;height:36px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,0.95) 0%,rgba(126,255,245,0.6) 55%,transparent 100%);
+  box-shadow:0 0 22px rgba(126,255,245,0.9);
+  transform:translate(-50%,-50%);pointer-events:none;z-index:15;display:none;
+}
 
-.screen{position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(12,4,36,0.97),rgba(38,14,85,0.97));padding:16px 20px;text-align:center;overflow-y:auto;}
-.screen h1{font-family:'Fredoka One',cursive;font-size:clamp(1.9rem,7vw,3.8rem);background:linear-gradient(90deg,#ffe066,#ff6eb4,#7efff5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;margin-bottom:8px;animation:gp 2s ease-in-out infinite;}
+/* SCREENS */
+.screen{
+  position:absolute;inset:0;z-index:30;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,rgba(12,4,36,0.97),rgba(38,14,85,0.97));
+  padding:16px 20px;text-align:center;overflow-y:auto;
+}
+.screen h1{
+  font-family:'Baloo 2',cursive;font-weight:800;
+  font-size:clamp(2rem,7vw,3.8rem);
+  background:linear-gradient(90deg,#ffe066,#ff6eb4,#7efff5);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1.1;margin-bottom:8px;
+  animation:gp 2s ease-in-out infinite;
+}
 @keyframes gp{0%,100%{filter:brightness(1);}50%{filter:brightness(1.3);}}
 .screen>p{color:#b0aed0;font-size:clamp(0.82rem,2.3vw,1.05rem);margin-bottom:14px;line-height:1.5;}
-.box{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:13px 17px;margin-bottom:14px;width:100%;max-width:420px;text-align:left;}
-.box h3{font-family:'Fredoka One',cursive;color:#ffe066;font-size:0.97rem;margin-bottom:8px;}
+.box{
+  background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);
+  border-radius:16px;padding:13px 17px;margin-bottom:14px;width:100%;max-width:420px;text-align:left;
+}
+.box h3{font-family:'Baloo 2',cursive;font-weight:800;color:#ffe066;font-size:0.97rem;margin-bottom:8px;}
 .box li{list-style:none;color:#d0cef0;margin:5px 0;font-size:0.85rem;display:flex;align-items:center;gap:7px;}
-.gbtn{font-family:'Fredoka One',cursive;font-size:clamp(1.15rem,4vw,1.65rem);padding:13px 42px;background:linear-gradient(135deg,#ff6eb4,#ff3d9a);border:none;border-radius:50px;color:#fff;cursor:pointer;box-shadow:0 6px 24px rgba(255,61,154,0.5);animation:bp 2s infinite;}
-@keyframes bp{0%,100%{box-shadow:0 6px 24px rgba(255,61,154,0.5),0 0 0 0 rgba(255,61,154,0.3);}50%{box-shadow:0 6px 24px rgba(255,61,154,0.5),0 0 0 12px rgba(255,61,154,0);}}
+.gbtn{
+  font-family:'Baloo 2',cursive;font-weight:800;
+  font-size:clamp(1.2rem,4vw,1.65rem);
+  padding:13px 42px;
+  background:linear-gradient(135deg,#ff6eb4,#ff3d9a);
+  border:none;border-radius:50px;color:#fff;cursor:pointer;
+  box-shadow:0 6px 24px rgba(255,61,154,0.5);
+  animation:bp 2s infinite;
+}
+@keyframes bp{
+  0%,100%{box-shadow:0 6px 24px rgba(255,61,154,0.5),0 0 0 0 rgba(255,61,154,0.3);}
+  50%{box-shadow:0 6px 24px rgba(255,61,154,0.5),0 0 0 12px rgba(255,61,154,0);}
+}
 .gbtn:active{transform:scale(0.95);}
-#cam-status{font-size:clamp(0.78rem,2.3vw,0.92rem);color:#7efff5;margin-top:12px;min-height:20px;text-shadow:0 1px 4px rgba(0,0,0,0.8);}
+#cam-status{font-size:clamp(0.78rem,2.3vw,0.92rem);color:#7efff5;margin-top:12px;min-height:20px;}
 
-/* İmza */
-.signature{margin-top:14px;padding:8px 16px;border-top:1px solid rgba(255,255,255,0.1);text-align:center;}
-.signature span{font-size:clamp(0.65rem,1.8vw,0.78rem);color:rgba(255,255,255,0.35);letter-spacing:0.03em;}
-.signature strong{color:rgba(255,255,255,0.55);font-weight:700;}
+.signature{margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);}
+.signature span{font-size:clamp(0.62rem,1.7vw,0.75rem);color:rgba(255,255,255,0.35);}
+.signature strong{color:rgba(255,255,255,0.52);}
 
+/* END */
 #end-screen{display:none;}
-#fs{font-family:'Fredoka One',cursive;font-size:clamp(4rem,14vw,7.5rem);background:linear-gradient(90deg,#ff6eb4,#ffe066);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+#fs{
+  font-family:'Baloo 2',cursive;font-weight:800;
+  font-size:clamp(4rem,14vw,7.5rem);
+  background:linear-gradient(90deg,#ff6eb4,#ffe066);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
 #rnk{font-size:clamp(0.9rem,2.8vw,1.25rem);color:#7efff5;margin:5px 0 10px;}
 #goal-res{font-size:clamp(0.82rem,2.3vw,1rem);margin-bottom:15px;}
-.rbtn{font-family:'Fredoka One',cursive;font-size:1.25rem;padding:11px 38px;background:linear-gradient(135deg,#7efff5,#00bcd4);border:none;border-radius:50px;color:#1a0533;cursor:pointer;}
+.rbtn{
+  font-family:'Baloo 2',cursive;font-weight:800;font-size:1.25rem;
+  padding:11px 38px;background:linear-gradient(135deg,#7efff5,#00bcd4);
+  border:none;border-radius:50px;color:#1a0533;cursor:pointer;
+}
 
-#egg{position:absolute;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(200,70,0,0.97),rgba(170,0,80,0.97));padding:20px;text-align:center;}
-#egg h2{font-family:'Fredoka One',cursive;font-size:clamp(1.9rem,7vw,4rem);color:#ffe066;text-shadow:0 0 30px #ff6600;margin-bottom:10px;}
+/* EASTER EGG */
+#egg{
+  position:absolute;inset:0;z-index:50;display:none;
+  flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,rgba(200,70,0,0.97),rgba(170,0,80,0.97));
+  padding:20px;text-align:center;
+}
+#egg h2{font-family:'Baloo 2',cursive;font-weight:800;font-size:clamp(1.9rem,7vw,4rem);color:#ffe066;text-shadow:0 0 30px #ff6600;margin-bottom:10px;}
 #egg p{font-size:clamp(0.95rem,2.8vw,1.35rem);color:#fff;margin-bottom:22px;line-height:1.5;white-space:pre-line;}
 
-#balert{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Fredoka One',cursive;font-size:clamp(1.2rem,4.5vw,2.3rem);color:#ff4444;text-shadow:0 0 20px #ff0000;pointer-events:none;z-index:25;display:none;}
+/* BOMB ALERT */
+#balert{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:'Baloo 2',cursive;font-weight:800;
+  font-size:clamp(1.2rem,4.5vw,2.3rem);
+  color:#ff4444;text-shadow:0 0 20px #ff0000;
+  pointer-events:none;z-index:25;display:none;
+}
 #loading{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:0.78rem;color:rgba(255,255,255,0.38);z-index:25;}
 </style>
 </head>
@@ -64,17 +138,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a0533;font-family:
   <div id="hud">
     <div class="hi" id="h-sc">⭐ <span id="sc">0</span></div>
     <div class="hi" id="h-lv">Lv.<span id="lv">1</span></div>
-    <div class="hi" id="h-tm">⏱<span id="tm">60</span>s</div>
+    <div id="h-tm-wrap">
+      <div class="hi" id="h-tm">⏱<span id="tm">60</span>s</div>
+      <button id="btn-fs" title="Tam Ekran">⛶</button>
+    </div>
   </div>
   <div id="h-goal">🎯 <span id="gtxt">30 balon patlat → 🍫 Çikolata!</span></div>
 
   <div id="dot"></div>
   <div id="balert">💥 BOMBA! Puan Sıfır!</div>
-
-  <div id="toolbar">
-    <button class="tbtn" id="btn-mirror">🔄</button>
-    <button class="tbtn" id="btn-fs">⛶</button>
-  </div>
 
   <!-- START -->
   <div class="screen" id="ss">
@@ -105,7 +177,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a0533;font-family:
     <div id="rnk"></div>
     <div id="goal-res"></div>
     <button class="rbtn" onclick="restartGame()">🔄 Tekrar Oyna</button>
-    <div class="signature" style="margin-top:16px;">
+    <div class="signature" style="margin-top:14px;">
       <span>Ali Şahin · <strong>Özel Fatsa Bahçeşehir Koleji</strong></span>
     </div>
   </div>
@@ -117,19 +189,23 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a0533;font-family:
     <button class="rbtn" onclick="document.getElementById('egg').style.display='none'">🎮 Devam Et</button>
   </div>
 
-  <div id="loading">Yükleniyor...</div>
+  <div id="loading">Model yükleniyor...</div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+<!-- TensorFlow.js + HandPose (MediaPipe'dan çok daha hafif) -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core@4.17.0/dist/tf-core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl@4.17.0/dist/tf-backend-webgl.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/hand-pose-detection@2.0.1/dist/hand-pose-detection.min.js"></script>
+
 <script>
-const GOAL=30,GAME_SEC=60,BOMB_EVERY=10000;
+const GOAL=30, GAME_SEC=60, BOMB_EVERY=10000;
 const isMob=/Android|iPhone|iPad/i.test(navigator.userAgent);
+
 let score=0,poppedCount=0,timeLeft=GAME_SEC,level=1;
 let gameActive=false,timerInt=null,bombTmr=null;
 let fx=-1,fy=-1,lastPop=0,handsReady=false,goalDone=false;
-let mirrorMode=true;
 let bubbles=[],bombs=[],particles=[],floaters=[];
+let detector=null,detLoop=null;
 
 const vid=document.getElementById('vid');
 const gc=document.getElementById('gc');
@@ -140,16 +216,13 @@ function resize(){gc.width=window.innerWidth;gc.height=window.innerHeight;}
 resize();
 window.addEventListener('resize',resize);
 
-document.getElementById('btn-mirror').onclick=()=>{
-  mirrorMode=!mirrorMode;
-  document.getElementById('btn-mirror').textContent=mirrorMode?'🔄':'↔️';
-};
 document.getElementById('btn-fs').onclick=()=>{
   const el=document.documentElement;
   if(!document.fullscreenElement)el.requestFullscreen?.();
   else document.exitFullscreen?.();
 };
 
+// ── COLORS ─────────────────────────────────────────
 const COLS=[
   {fill:'rgba(255,110,180,0.82)',glow:'#ff3d9a',pts:1},
   {fill:'rgba(126,255,245,0.82)',glow:'#00bcd4',pts:1},
@@ -159,6 +232,7 @@ const COLS=[
   {fill:'rgba(255,160,80,0.82)', glow:'#ff6d00',pts:3},
 ];
 
+// ── BUBBLE ──────────────────────────────────────────
 class Bubble{
   constructor(rainbow=false){this.rainbow=rainbow;this.hue=0;this.reset(true);}
   reset(init=false){
@@ -201,15 +275,12 @@ class Bubble{
       g.addColorStop(1,this.col.fill.replace('0.82','0.2'));
       ctx.beginPath();ctx.arc(wx,this.y,this.r,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
       ctx.shadowBlur=0;
-      // shine
       ctx.beginPath();ctx.arc(wx-this.r*.27,this.y-this.r*.27,this.r*.19,0,Math.PI*2);
       ctx.fillStyle='rgba(255,255,255,0.5)';ctx.fill();
-      // border
       ctx.beginPath();ctx.arc(wx,this.y,this.r,0,Math.PI*2);
       ctx.strokeStyle='rgba(255,255,255,0.22)';ctx.lineWidth=2;ctx.stroke();
-      // puan — canvas transform YOK, metin düzgün çıkar
       if(this.col.pts>1){
-        ctx.font=`bold ${this.r*.52}px Fredoka One,cursive`;
+        ctx.font=`bold ${this.r*.52}px Baloo 2,cursive`;
         ctx.fillStyle='rgba(255,255,255,0.95)';
         ctx.textAlign='center';ctx.textBaseline='middle';
         ctx.fillText('+'+this.col.pts,wx,this.y);
@@ -224,6 +295,7 @@ class Bubble{
   }
 }
 
+// ── BOMB ────────────────────────────────────────────
 class Bomb{
   constructor(){
     const m=80;this.r=30;
@@ -237,8 +309,7 @@ class Bomb{
     if(!this.alive)return;
     const wx=this.x+Math.sin(this.wob)*3,pulse=0.85+Math.sin(this.tick*.15)*.15;
     ctx.save();ctx.shadowBlur=20*pulse;ctx.shadowColor='#ff2200';
-    ctx.font=`${this.r*1.9*pulse}px serif`;
-    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.font=`${this.r*1.9*pulse}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillText('💣',wx,this.y);ctx.restore();
   }
   hit(px,py){
@@ -258,13 +329,12 @@ class Particle{
   update(){this.x+=this.vx;this.y+=this.vy;this.vy+=.18;this.life-=this.decay;}
   draw(){ctx.save();ctx.globalAlpha=this.life;ctx.beginPath();ctx.arc(this.x,this.y,this.r*this.life,0,Math.PI*2);ctx.fillStyle=this.color;ctx.fill();ctx.restore();}
 }
-
 class Floater{
   constructor(x,y,t,c='#ffe066'){this.x=x;this.y=y;this.text=t;this.color=c;this.life=1;this.decay=0.022;}
   update(){this.y-=2.5;this.life-=this.decay;}
   draw(){
     ctx.save();ctx.globalAlpha=this.life;
-    ctx.font='bold 1.7rem Fredoka One,cursive';
+    ctx.font='bold 1.7rem Baloo 2,cursive';
     ctx.strokeStyle='rgba(0,0,0,0.65)';ctx.lineWidth=4;
     ctx.fillStyle=this.color;ctx.textAlign='center';
     ctx.strokeText(this.text,this.x,this.y);
@@ -280,10 +350,10 @@ function initBubbles(){
   const rb=new Bubble(true);rb.y=Math.random()*window.innerHeight;bubbles.push(rb);
 }
 
+// ── GAME LOOP ───────────────────────────────────────
 function loop(){
   if(!gameActive)return;
   ctx.clearRect(0,0,gc.width,gc.height);
-
   for(const b of bubbles){b.update();b.draw();}
   bombs=bombs.filter(b=>b.alive);
   for(const b of bombs){b.update();b.draw();}
@@ -298,8 +368,7 @@ function loop(){
         document.getElementById('sc').textContent=score;
         playPop();
         const clr=b.rainbow?`hsl(${Math.random()*360},100%,60%)`:b.col.glow;
-        const pc=isMob?7:12;
-        for(let i=0;i<pc;i++)particles.push(new Particle(b.x,b.y,clr));
+        for(let i=0;i<(isMob?7:12);i++)particles.push(new Particle(b.x,b.y,clr));
         floaters.push(new Floater(b.x,b.y-b.r,b.rainbow?'+5 🌈':'+'+pts,b.rainbow?'#7efff5':'#ffe066'));
         if(poppedCount>=GOAL&&!goalDone){goalDone=true;showEgg();}
         const nl=Math.floor(score/25)+1;
@@ -333,47 +402,73 @@ function loop(){
 
 function spawnBomb(){if(!gameActive)return;bombs.push(new Bomb());bombTmr=setTimeout(spawnBomb,BOMB_EVERY);}
 function showBAlert(){const el=document.getElementById('balert');el.style.display='block';setTimeout(()=>{el.style.display='none';},1100);}
-function showEgg(){
-  document.getElementById('egg-msg').textContent=`${GOAL} balon patlattın!\nÖğretmenden çikolatanı al! 🎁`;
-  document.getElementById('egg').style.display='flex';
-}
+function showEgg(){document.getElementById('egg-msg').textContent=`${GOAL} balon patlattın!\nÖğretmenden çikolatanı al! 🎁`;document.getElementById('egg').style.display='flex';}
 
 let actx=null;
 function getA(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();return actx;}
 function playPop(){try{const a=getA(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='sine';o.frequency.setValueAtTime(500+Math.random()*500,a.currentTime);o.frequency.exponentialRampToValueAtTime(150,a.currentTime+.12);g.gain.setValueAtTime(.22,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.12);o.start();o.stop(a.currentTime+.12);}catch(e){}}
 function playBoom(){try{const a=getA(),buf=a.createBuffer(1,a.sampleRate*.4,a.sampleRate),d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);const s=a.createBufferSource(),g=a.createGain();s.buffer=buf;s.connect(g);g.connect(a.destination);g.gain.setValueAtTime(.45,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.4);s.start();}catch(e){}}
 
-let hands=null,mpCam=null;
-function setupMP(){
-  hands=new Hands({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
-  hands.setOptions({maxNumHands:1,modelComplexity:0,minDetectionConfidence:0.55,minTrackingConfidence:0.45,selfieMode:true});
-  let fc=0;
-  hands.onResults(res=>{
-    if(!handsReady){
-      handsReady=true;
-      document.getElementById('loading').style.display='none';
-      document.getElementById('cam-status').textContent='✅ Kamera hazır! Başlayabilirsin.';
-    }
-    if(!gameActive)return;
-    if(res.multiHandLandmarks&&res.multiHandLandmarks.length>0){
-      const tip=res.multiHandLandmarks[0][8];
-      // selfieMode:true → koordinatlar zaten aynalı (sol=sol, sağ=sağ)
-      // Video CSS'de scaleX(-1) ile aynalı → görsel eşleşir
-      // mirrorMode kapalıysa koordinatı ters çevir
-      fx=mirrorMode ? tip.x*window.innerWidth : (1-tip.x)*window.innerWidth;
-      fy=tip.y*window.innerHeight;
-      dot.style.left=fx+'px';dot.style.top=fy+'px';dot.style.display='block';
-    }else{fx=-1;fy=-1;dot.style.display='none';}
-  });
-  mpCam=new Camera(vid,{
-    onFrame:async()=>{fc++;if(isMob&&fc%3!==0)return;await hands.send({image:vid});},
-    width:isMob?256:480,height:isMob?192:360
-  });
-  mpCam.start()
-    .then(()=>{document.getElementById('cam-status').textContent='🔄 Model yükleniyor...';})
-    .catch(()=>{document.getElementById('cam-status').textContent='❌ Kamera izni gerekli!';});
+// ── HAND DETECTION (TF.js — çok daha hafif) ────────
+async function setupDetector(){
+  try {
+    await tf.setBackend('webgl');
+    await tf.ready();
+
+    const model = handPoseDetection.SupportedModels.MediaPipeHands;
+    const config = {
+      runtime: 'tfjs',
+      modelType: 'lite',       // lite = çok hafif
+      maxHands: 1,
+    };
+    detector = await handPoseDetection.createDetector(model, config);
+
+    // Kamera aç
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video:{width:320,height:240,facingMode:'user'},
+      audio:false
+    });
+    vid.srcObject=stream;
+    await new Promise(r=>vid.onloadedmetadata=r);
+    vid.play();
+
+    handsReady=true;
+    document.getElementById('loading').style.display='none';
+    document.getElementById('cam-status').textContent='✅ Kamera hazır! Başlayabilirsin.';
+
+    // Tespit döngüsü — oyun aktif olunca çalışır
+    detectLoop();
+  } catch(e){
+    document.getElementById('cam-status').textContent='❌ Kamera izni gerekli! Lütfen izin ver.';
+    console.error(e);
+  }
 }
 
+let lastDetect=0;
+async function detectLoop(){
+  // Hedef: ~20fps tespit (her 50ms)
+  const now=performance.now();
+  if(now-lastDetect>50 && vid.readyState>=2){
+    lastDetect=now;
+    try{
+      const hands=await detector.estimateHands(vid,{flipHorizontal:true});
+      if(gameActive){
+        if(hands.length>0){
+          // index finger tip = keypoint 8
+          const tip=hands[0].keypoints[8];
+          fx=tip.x/vid.videoWidth*window.innerWidth;
+          fy=tip.y/vid.videoHeight*window.innerHeight;
+          dot.style.left=fx+'px';dot.style.top=fy+'px';dot.style.display='block';
+        }else{
+          fx=-1;fy=-1;dot.style.display='none';
+        }
+      }
+    }catch(e){}
+  }
+  requestAnimationFrame(detectLoop);
+}
+
+// ── GAME FLOW ────────────────────────────────────────
 function startGame(){
   if(!handsReady){document.getElementById('cam-status').textContent='⏳ Biraz bekle...';return;}
   score=0;poppedCount=0;timeLeft=GAME_SEC;level=1;goalDone=false;
@@ -408,7 +503,7 @@ function endGame(){
 
 function restartGame(){document.getElementById('end-screen').style.display='none';startGame();}
 document.getElementById('sbtn').onclick=startGame;
-window.addEventListener('load',()=>{setTimeout(setupMP,600);});
+window.addEventListener('load',()=>{ setupDetector(); });
 </script>
 </body>
 </html>
