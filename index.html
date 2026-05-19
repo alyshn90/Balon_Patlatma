@@ -9,9 +9,22 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:100%;height:100%;overflow:hidden;background:#1a0533;font-family:'Nunito',sans-serif;color:#fff;}
 #wrap{position:fixed;inset:0;}
-#vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.2;transform:scaleX(-1);}
+
+/* Video gizli ama MediaPipe için var */
+#vid{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;}
+
+/* Arka plan animasyonu */
+#bg{position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(80,0,160,0.5) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(0,80,160,0.4) 0%,transparent 55%),radial-gradient(ellipse at 60% 80%,rgba(160,0,80,0.3) 0%,transparent 50%),linear-gradient(135deg,#0f0520,#1a0533,#0a0a2a);animation:bgShift 8s ease-in-out infinite alternate;}
+@keyframes bgShift{0%{filter:hue-rotate(0deg);}100%{filter:hue-rotate(30deg);}}
+
 #gc{position:absolute;inset:0;width:100%;height:100%;}
-#hud{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:linear-gradient(180deg,rgba(0,0,0,0.75) 0%,transparent 100%);pointer-events:none;z-index:10;}
+
+/* Stars */
+#stars{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d) ease-in-out infinite alternate;}
+@keyframes twinkle{0%{opacity:0.1;transform:scale(1);}100%{opacity:0.8;transform:scale(1.5);}}
+
+#hud{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:linear-gradient(180deg,rgba(0,0,0,0.6) 0%,transparent 100%);pointer-events:none;z-index:10;}
 .hi{font-family:'Baloo 2',cursive;font-size:clamp(1.2rem,4vw,1.8rem);text-shadow:0 2px 8px rgba(0,0,0,0.9);}
 #h-sc{color:#ffe066;}#h-lv{color:#7efff5;}
 #h-tm-wrap{display:flex;align-items:center;gap:8px;pointer-events:all;}
@@ -19,7 +32,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a0533;font-family:
 #btn-fs{width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.5);color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;pointer-events:all;}
 #btn-fs:active{transform:scale(0.88);}
 #h-goal{position:absolute;top:52px;left:0;right:0;text-align:center;font-family:'Baloo 2',cursive;font-size:clamp(0.7rem,2vw,0.9rem);color:rgba(255,255,255,0.8);pointer-events:none;z-index:10;text-shadow:0 1px 6px rgba(0,0,0,0.9);}
-#dot{position:absolute;width:36px;height:36px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.95) 0%,rgba(126,255,245,0.6) 55%,transparent 100%);box-shadow:0 0 22px rgba(126,255,245,0.9);transform:translate(-50%,-50%);pointer-events:none;z-index:15;display:none;}
+
+/* Finger cursor */
+#dot{position:absolute;pointer-events:none;z-index:15;display:none;transform:translate(-50%,-50%);}
+#dot-inner{width:20px;height:20px;border-radius:50%;background:radial-gradient(circle,#fff 0%,rgba(126,255,245,0.9) 50%,transparent 100%);box-shadow:0 0 15px rgba(126,255,245,1),0 0 30px rgba(126,255,245,0.6);animation:dotPulse 0.6s ease-in-out infinite alternate;}
+@keyframes dotPulse{0%{transform:scale(1);}100%{transform:scale(1.3);}}
+#dot-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;border:2px solid rgba(126,255,245,0.5);animation:ringPulse 1s ease-out infinite;}
+@keyframes ringPulse{0%{transform:translate(-50%,-50%) scale(0.8);opacity:0.8;}100%{transform:translate(-50%,-50%) scale(1.4);opacity:0;}}
+
+/* SCREENS */
 .screen{position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(12,4,36,0.97),rgba(38,14,85,0.97));padding:16px 20px;text-align:center;overflow-y:auto;}
 .screen h1{font-family:'Baloo 2',cursive;font-weight:800;font-size:clamp(2rem,7vw,3.8rem);background:linear-gradient(90deg,#ffe066,#ff6eb4,#7efff5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;margin-bottom:8px;animation:gp 2s ease-in-out infinite;}
 @keyframes gp{0%,100%{filter:brightness(1);}50%{filter:brightness(1.3);}}
@@ -30,7 +51,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a0533;font-family:
 .gbtn{font-family:'Baloo 2',cursive;font-weight:800;font-size:clamp(1.2rem,4vw,1.65rem);padding:13px 42px;background:linear-gradient(135deg,#ff6eb4,#ff3d9a);border:none;border-radius:50px;color:#fff;cursor:pointer;box-shadow:0 6px 24px rgba(255,61,154,0.5);animation:bp 2s infinite;}
 @keyframes bp{0%,100%{box-shadow:0 6px 24px rgba(255,61,154,0.5),0 0 0 0 rgba(255,61,154,0.3);}50%{box-shadow:0 6px 24px rgba(255,61,154,0.5),0 0 0 12px rgba(255,61,154,0);}}
 .gbtn:active{transform:scale(0.95);}
-#cam-status{font-size:clamp(0.78rem,2.3vw,0.95rem);color:#7efff5;margin-top:12px;min-height:22px;text-shadow:0 1px 4px rgba(0,0,0,0.8);}
+#cam-status{font-size:clamp(0.78rem,2.3vw,0.95rem);color:#7efff5;margin-top:12px;min-height:22px;}
 .signature{margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);}
 .signature span{font-size:clamp(0.62rem,1.7vw,0.75rem);color:rgba(255,255,255,0.35);}
 .signature strong{color:rgba(255,255,255,0.52);}
@@ -48,8 +69,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a0533;font-family:
 </head>
 <body>
 <div id="wrap">
+  <div id="bg"></div>
+  <div id="stars"></div>
   <video id="vid" playsinline autoplay muted></video>
   <canvas id="gc"></canvas>
+
   <div id="hud">
     <div class="hi" id="h-sc">⭐ <span id="sc">0</span></div>
     <div class="hi" id="h-lv">Lv.<span id="lv">1</span></div>
@@ -59,9 +83,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a0533;font-family:
     </div>
   </div>
   <div id="h-goal">🎯 <span>30 balon patlat → 🍫 Çikolata!</span></div>
-  <div id="dot"></div>
+
+  <div id="dot">
+    <div id="dot-inner"></div>
+    <div id="dot-ring"></div>
+  </div>
   <div id="balert">💥 BOMBA! Puan Sıfır!</div>
 
+  <!-- START -->
   <div class="screen" id="ss">
     <h1>🎈 Baloncuk<br>Patlatma!</h1>
     <p>Parmağınla balonları patlat!<br>Ekrana dokunmana gerek yok ✨</p>
@@ -83,6 +112,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a0533;font-family:
     </div>
   </div>
 
+  <!-- END -->
   <div class="screen" id="end-screen">
     <h1 style="font-size:clamp(1.5rem,5vw,2.6rem)">🎉 Süre Doldu!</h1>
     <div id="fs">0</div>
@@ -94,21 +124,32 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a0533;font-family:
     </div>
   </div>
 
+  <!-- EASTER EGG -->
   <div id="egg">
     <h2>🍫 TEBRİKLER!</h2>
     <p id="egg-msg"></p>
     <button class="rbtn" onclick="document.getElementById('egg').style.display='none'">🎮 Devam Et</button>
   </div>
 
-  <div id="loading">MediaPipe yükleniyor...</div>
+  <div id="loading">Model yükleniyor...</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1646424915/hands.min.js" crossorigin="anonymous"></script>
-
 <script>
+// ── STARS ──────────────────────────────────────────
+(()=>{
+  const c=document.getElementById('stars');
+  for(let i=0;i<60;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    const sz=1+Math.random()*2.5;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${1.5+Math.random()*3}s;animation-delay:${Math.random()*3}s;`;
+    c.appendChild(s);
+  }
+})();
+
 const GOAL=30, GAME_SEC=60, BOMB_EVERY=10000;
 const isMob=/Android|iPhone|iPad/i.test(navigator.userAgent);
-
 let score=0,poppedCount=0,timeLeft=GAME_SEC,level=1;
 let gameActive=false,timerInt=null,bombTmr=null;
 let fx=-1,fy=-1,lastPop=0,handsReady=false,goalDone=false;
@@ -128,15 +169,17 @@ document.getElementById('btn-fs').onclick=()=>{
   else document.exitFullscreen?.();
 };
 
+// ── COLORS ─────────────────────────────────────────
 const COLS=[
-  {fill:'rgba(255,110,180,0.82)',glow:'#ff3d9a',pts:1},
-  {fill:'rgba(126,255,245,0.82)',glow:'#00bcd4',pts:1},
-  {fill:'rgba(255,224,102,0.82)',glow:'#ffb300',pts:2},
-  {fill:'rgba(160,140,255,0.82)',glow:'#7c4dff',pts:1},
-  {fill:'rgba(100,255,150,0.82)',glow:'#00e676',pts:2},
-  {fill:'rgba(255,160,80,0.82)', glow:'#ff6d00',pts:3},
+  {fill:'rgba(255,110,180,0.85)',glow:'#ff3d9a',pts:1},
+  {fill:'rgba(126,255,245,0.85)',glow:'#00bcd4',pts:1},
+  {fill:'rgba(255,224,102,0.85)',glow:'#ffb300',pts:2},
+  {fill:'rgba(160,140,255,0.85)',glow:'#7c4dff',pts:1},
+  {fill:'rgba(100,255,150,0.85)',glow:'#00e676',pts:2},
+  {fill:'rgba(255,160,80,0.85)', glow:'#ff6d00',pts:3},
 ];
 
+// ── BUBBLE ─────────────────────────────────────────
 class Bubble{
   constructor(rainbow=false){this.rainbow=rainbow;this.hue=0;this.reset(true);}
   reset(init=false){
@@ -172,15 +215,15 @@ class Bubble{
       ctx.font=`${this.r}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
       ctx.fillText('🌈',wx,this.y);
     }else{
-      ctx.shadowBlur=16;ctx.shadowColor=this.col.glow;
+      ctx.shadowBlur=18;ctx.shadowColor=this.col.glow;
       const g=ctx.createRadialGradient(wx-this.r*.3,this.y-this.r*.3,this.r*.1,wx,this.y,this.r);
-      g.addColorStop(0,'rgba(255,255,255,0.65)');
+      g.addColorStop(0,'rgba(255,255,255,0.7)');
       g.addColorStop(.4,this.col.fill);
-      g.addColorStop(1,this.col.fill.replace('0.82','0.2'));
+      g.addColorStop(1,this.col.fill.replace('0.85','0.15'));
       ctx.beginPath();ctx.arc(wx,this.y,this.r,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
       ctx.shadowBlur=0;
-      ctx.beginPath();ctx.arc(wx-this.r*.27,this.y-this.r*.27,this.r*.19,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,0.5)';ctx.fill();
-      ctx.beginPath();ctx.arc(wx,this.y,this.r,0,Math.PI*2);ctx.strokeStyle='rgba(255,255,255,0.22)';ctx.lineWidth=2;ctx.stroke();
+      ctx.beginPath();ctx.arc(wx-this.r*.27,this.y-this.r*.27,this.r*.2,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,0.55)';ctx.fill();
+      ctx.beginPath();ctx.arc(wx,this.y,this.r,0,Math.PI*2);ctx.strokeStyle='rgba(255,255,255,0.25)';ctx.lineWidth=2;ctx.stroke();
       if(this.col.pts>1){
         ctx.font=`bold ${this.r*.52}px Baloo 2,cursive`;
         ctx.fillStyle='rgba(255,255,255,0.95)';
@@ -193,6 +236,7 @@ class Bubble{
   hit(px,py){if(!this.alive)return false;const wx=this.x+Math.sin(this.wob)*3;return Math.hypot(px-wx,py-this.y)<this.r+12;}
 }
 
+// ── BOMB ───────────────────────────────────────────
 class Bomb{
   constructor(){
     const m=80;this.r=30;
@@ -204,7 +248,7 @@ class Bomb{
   draw(){
     if(!this.alive)return;
     const wx=this.x+Math.sin(this.wob)*3,pulse=0.85+Math.sin(this.tick*.15)*.15;
-    ctx.save();ctx.shadowBlur=20*pulse;ctx.shadowColor='#ff2200';
+    ctx.save();ctx.shadowBlur=22*pulse;ctx.shadowColor='#ff2200';
     ctx.font=`${this.r*1.9*pulse}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillText('💣',wx,this.y);ctx.restore();
   }
@@ -212,7 +256,7 @@ class Bomb{
 }
 
 class Particle{
-  constructor(x,y,c){this.x=x;this.y=y;this.color=c;const a=Math.random()*Math.PI*2,s=3+Math.random()*7;this.vx=Math.cos(a)*s;this.vy=Math.sin(a)*s;this.life=1;this.decay=0.04+Math.random()*.04;this.r=3+Math.random()*5;}
+  constructor(x,y,c){this.x=x;this.y=y;this.color=c;const a=Math.random()*Math.PI*2,s=3+Math.random()*8;this.vx=Math.cos(a)*s;this.vy=Math.sin(a)*s;this.life=1;this.decay=0.035+Math.random()*.04;this.r=3+Math.random()*6;}
   update(){this.x+=this.vx;this.y+=this.vy;this.vy+=.18;this.life-=this.decay;}
   draw(){ctx.save();ctx.globalAlpha=this.life;ctx.beginPath();ctx.arc(this.x,this.y,this.r*this.life,0,Math.PI*2);ctx.fillStyle=this.color;ctx.fill();ctx.restore();}
 }
@@ -229,12 +273,14 @@ function initBubbles(){
   const rb=new Bubble(true);rb.y=Math.random()*window.innerHeight;bubbles.push(rb);
 }
 
+// ── GAME LOOP (sadece render) ───────────────────────
 function gameLoop(){
   if(!gameActive)return;
   ctx.clearRect(0,0,gc.width,gc.height);
   for(const b of bubbles){b.update();b.draw();}
   bombs=bombs.filter(b=>b.alive);
   for(const b of bombs){b.update();b.draw();}
+
   if(fx>0&&fy>0){
     const now=Date.now();
     for(const b of bubbles){
@@ -245,7 +291,7 @@ function gameLoop(){
         document.getElementById('sc').textContent=score;
         playPop();
         const clr=b.rainbow?`hsl(${Math.random()*360},100%,60%)`:b.col.glow;
-        for(let i=0;i<(isMob?7:12);i++)particles.push(new Particle(b.x,b.y,clr));
+        for(let i=0;i<(isMob?8:14);i++)particles.push(new Particle(b.x,b.y,clr));
         floaters.push(new Floater(b.x,b.y-b.r,b.rainbow?'+5 🌈':'+'+pts,b.rainbow?'#7efff5':'#ffe066'));
         if(poppedCount>=GOAL&&!goalDone){goalDone=true;showEgg();}
         const nl=Math.floor(score/25)+1;
@@ -262,15 +308,24 @@ function gameLoop(){
       }
     }
   }
+
   particles=particles.filter(p=>p.life>0);for(const p of particles){p.update();p.draw();}
   floaters=floaters.filter(f=>f.life>0);for(const f of floaters){f.update();f.draw();}
+
+  // Parmak ışığı
   if(fx>0){
     ctx.save();
-    const g=ctx.createRadialGradient(fx,fy,0,fx,fy,26);
-    g.addColorStop(0,'rgba(126,255,245,0.85)');g.addColorStop(1,'rgba(126,255,245,0)');
-    ctx.beginPath();ctx.arc(fx,fy,26,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+    // Dış hale
+    const g1=ctx.createRadialGradient(fx,fy,0,fx,fy,40);
+    g1.addColorStop(0,'rgba(126,255,245,0.4)');g1.addColorStop(1,'rgba(126,255,245,0)');
+    ctx.beginPath();ctx.arc(fx,fy,40,0,Math.PI*2);ctx.fillStyle=g1;ctx.fill();
+    // İç parlak nokta
+    const g2=ctx.createRadialGradient(fx,fy,0,fx,fy,12);
+    g2.addColorStop(0,'rgba(255,255,255,1)');g2.addColorStop(.4,'rgba(126,255,245,0.9)');g2.addColorStop(1,'rgba(126,255,245,0)');
+    ctx.beginPath();ctx.arc(fx,fy,12,0,Math.PI*2);ctx.fillStyle=g2;ctx.fill();
     ctx.restore();
   }
+
   requestAnimationFrame(gameLoop);
 }
 
@@ -283,24 +338,25 @@ function getA(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext
 function playPop(){try{const a=getA(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='sine';o.frequency.setValueAtTime(500+Math.random()*500,a.currentTime);o.frequency.exponentialRampToValueAtTime(150,a.currentTime+.12);g.gain.setValueAtTime(.22,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.12);o.start();o.stop(a.currentTime+.12);}catch(e){}}
 function playBoom(){try{const a=getA(),buf=a.createBuffer(1,a.sampleRate*.4,a.sampleRate),d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);const s=a.createBufferSource(),g=a.createGain();s.buffer=buf;s.connect(g);g.connect(a.destination);g.gain.setValueAtTime(.45,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.4);s.start();}catch(e){}}
 
-// ── MEDIAPIPE — sadece kamera, onFrame YOK ──────────
-// Bunun yerine setInterval ile 10fps tespit yapıyoruz
-// Oyun döngüsü hiç bloklanmıyor
+// ── MEDIAPIPE ─────────────────────────────────────
+// Kritik değişiklik: send() Promise zinciri — bir önceki bitmeden
+// yeni gönderim YAPMA. Bu ana thread'i bloklamaz.
 let mpHands=null;
-let detecting=false;
+let mpBusy=false;
+let mpInterval=null;
 
 async function setupCamera(){
-  const stream = await navigator.mediaDevices.getUserMedia({
+  const stream=await navigator.mediaDevices.getUserMedia({
     video:{width:320,height:240,facingMode:'user'},audio:false
   });
   vid.srcObject=stream;
   await new Promise(r=>{vid.onloadedmetadata=r;});
-  vid.play();
+  await vid.play();
 }
 
 function setupMediaPipe(){
-  mpHands = new Hands({
-    locateFile: f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1646424915/${f}`
+  mpHands=new Hands({
+    locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1646424915/${f}`
   });
   mpHands.setOptions({
     maxNumHands:1,
@@ -310,8 +366,7 @@ function setupMediaPipe(){
     selfieMode:true
   });
   mpHands.onResults(res=>{
-    detecting=false; // bir sonraki tespite izin ver
-    if(!gameActive)return;
+    mpBusy=false; // serbest bırak
     if(res.multiHandLandmarks&&res.multiHandLandmarks.length>0){
       const tip=res.multiHandLandmarks[0][8];
       fx=tip.x*window.innerWidth;
@@ -323,35 +378,38 @@ function setupMediaPipe(){
   });
 }
 
-// setInterval ile 10fps tespit — oyun döngüsünden bağımsız
-function startDetection(){
-  setInterval(async()=>{
-    if(detecting||!mpHands||vid.readyState<2)return;
-    detecting=true;
-    try{ await mpHands.send({image:vid}); }
-    catch(e){ detecting=false; }
-  }, 100); // 10fps
+function startDetectionLoop(){
+  // 150ms'de bir tespit — sadece önceki bitmişse
+  mpInterval=setInterval(()=>{
+    if(mpBusy||!mpHands||vid.readyState<2)return;
+    mpBusy=true;
+    mpHands.send({image:vid}).catch(()=>{mpBusy=false;});
+  },150);
 }
 
 async function init(){
-  const status=document.getElementById('cam-status');
+  const st=document.getElementById('cam-status');
   try{
-    status.textContent='📷 Kamera açılıyor...';
+    st.textContent='📷 Kamera açılıyor...';
     await setupCamera();
-    status.textContent='🔄 Model yükleniyor...';
+    st.textContent='🔄 Model yükleniyor...';
     setupMediaPipe();
-    // Modeli ısıt
+    // İlk ısınma — model yüklensin
+    await new Promise(r=>setTimeout(r,1000));
+    mpBusy=true;
     await mpHands.send({image:vid});
+    // onResults mpBusy=false yapar
     handsReady=true;
     document.getElementById('loading').style.display='none';
-    status.textContent='✅ Kamera hazır! Başlayabilirsin.';
-    startDetection();
+    st.textContent='✅ Kamera hazır! Başlayabilirsin.';
+    startDetectionLoop();
   }catch(e){
-    status.textContent='❌ Kamera izni gerekli! Lütfen izin ver.';
+    st.textContent='❌ Kamera izni gerekli!';
     console.error(e);
   }
 }
 
+// ── GAME FLOW ──────────────────────────────────────
 function startGame(){
   if(!handsReady){document.getElementById('cam-status').textContent='⏳ Biraz bekle...';return;}
   score=0;poppedCount=0;timeLeft=GAME_SEC;level=1;goalDone=false;
@@ -387,7 +445,7 @@ function endGame(){
 
 function restartGame(){document.getElementById('end-screen').style.display='none';startGame();}
 document.getElementById('sbtn').onclick=startGame;
-window.addEventListener('load', init);
+window.addEventListener('load',init);
 </script>
 </body>
 </html>
