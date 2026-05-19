@@ -466,9 +466,9 @@ const BOSS_PEN   = 30;
 
 // Zorluk tablosu — spawnRate: balon/kare, speedMin/Max: piksel/kare
 const DIFF_TABLE = {
-  easy:   { spawnBase:.020, spawnMax:.035, speedMin:1.0, speedMax:2.0, countBase:6, countMax:14 },
-  medium: { spawnBase:.026, spawnMax:.047, speedMin:1.5, speedMax:3.2, countBase:9, countMax:22 },
-  hard:   { spawnBase:.035, spawnMax:.063, speedMin:2.2, speedMax:4.8, countBase:12, countMax:30 },
+  easy:   { spawnBase:.030, spawnMax:.050, speedMin:1.0, speedMax:2.2, countBase:8,  countMax:18 },
+  medium: { spawnBase:.045, spawnMax:.070, speedMin:1.5, speedMax:3.5, countBase:12, countMax:28 },
+  hard:   { spawnBase:.065, spawnMax:.095, speedMin:2.2, speedMax:5.0, countBase:16, countMax:36 },
 };
 
 // ── DURUM ──────────────────────────────────────────────
@@ -723,8 +723,8 @@ function playLevelUp(){
 // ══════════════════════════════════════════════════════
 //   P5.JS OYUN MOTORU
 // ══════════════════════════════════════════════════════
-  let globalBgMusic = null;
-  function gameSketch(p){
+let globalBgMusic = null;
+function gameSketch(p){
   let balloons=[];
   let bParticles=[];
   let lastPop=0;
@@ -735,15 +735,15 @@ function playLevelUp(){
 
   // Saniyeye göre hız ve spawn çarpanı
   function getTimeMult(){
-    if(timeLeft>45) return 0.70;
-    if(timeLeft>30) return 0.88;
-    if(timeLeft>15) return 1.10;
-    return 1.35;
+    if(timeLeft>45) return 1.00;
+    if(timeLeft>30) return 1.25;
+    if(timeLeft>15) return 1.50;
+    return 1.75;
   }
 
   // Aktif balon sayısı üst limiti
   function getMaxBalloons(){
-    const base=D.countBase+Math.floor(level*2.5);
+    const base=D.countBase+Math.floor(level*3.5);
     return Math.min(base, D.countMax);
   }
 
@@ -992,7 +992,7 @@ function playLevelUp(){
         p.line(wx,this.y+this.r,wx+p.sin(this.wob)*5,this.y+this.r+16);
         p.noStroke();
         // Puan yazısı — gölgeli, orantılı, düzgün
-        if(this.points>1){
+        if(this.points>=1){
           p.drawingContext.shadowBlur=10;
           p.drawingContext.shadowColor='rgba(0,0,0,.9)';
           p.fill(255,255,255,248);
