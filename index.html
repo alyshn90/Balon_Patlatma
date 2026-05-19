@@ -578,6 +578,7 @@ function retryGame(){
 
 function endGame(){
   gameRunning=false;
+  if(globalBgMusic) try{ globalBgMusic.stop(); globalBgMusic=null; }catch(e){}
   document.getElementById('hud').classList.remove('active');
   document.getElementById('h-goal-bar').classList.remove('active');
   document.getElementById('boss-alert').style.display='none';
@@ -722,7 +723,8 @@ function playLevelUp(){
 // ══════════════════════════════════════════════════════
 //   P5.JS OYUN MOTORU
 // ══════════════════════════════════════════════════════
-function gameSketch(p){
+  let globalBgMusic = null;
+  function gameSketch(p){
   let balloons=[];
   let bParticles=[];
   let lastPop=0;
@@ -762,7 +764,7 @@ function gameSketch(p){
     if(musicLoaded&&bgMusic){
       amplitude=new p5.Amplitude(); fft=new p5.FFT();
       amplitude.setInput(bgMusic); fft.setInput(bgMusic);
-      p.userStartAudio().then(()=>{ bgMusic.loop(); bgMusic.setVolume(.45); });
+      p.userStartAudio().then(()=>{ bgMusic.loop(); bgMusic.setVolume(.45); globalBgMusic=bgMusic; });
     }
   };
 
