@@ -353,7 +353,7 @@ html,body{ width:100%; height:100%; overflow:hidden; background:var(--purple-dar
 ════════════════════════════════════ -->
 <div id="start-screen">
 
-  <div id="game-title">🎈 Baloncuk<br>Patlatma!</div>
+  <div id="game-title">🎈 Baloncuk Patlatma!</div>
 
   <button id="start-btn" onclick="startGame()">🚀 Oyuna Başla!</button>
 
@@ -388,7 +388,9 @@ html,body{ width:100%; height:100%; overflow:hidden; background:var(--purple-dar
   <div id="goal-text">🏆 150 Puana Ulaş → 🍫 Çikolata Kazan!</div>
 
   <div id="cam-status">📷 Kamera bağlanıyor...</div>
-
+<div style="font-size:.75rem;color:rgba(255,255,255,.35);margin-top:6px;">
+  📱 Telefonu yatay çevirip kilitlemenizi öneririz
+</div>
   <div class="signature">
     <span>Yapımcı: <strong>Ali Şahin</strong> · Fen Bilimleri Öğretmeni</span><br>
     <span style="font-size:.6rem;color:rgba(255,255,255,.18);">Özel Fatsa Bahçeşehir Koleji</span>
@@ -464,9 +466,9 @@ const BOSS_PEN   = 30;
 
 // Zorluk tablosu — spawnRate: balon/kare, speedMin/Max: piksel/kare
 const DIFF_TABLE = {
-  easy:   { spawnBase:.016, spawnMax:.030, speedMin:1.0, speedMax:2.0, countBase:4, countMax:10 },
-  medium: { spawnBase:.022, spawnMax:.042, speedMin:1.5, speedMax:3.2, countBase:6, countMax:16 },
-  hard:   { spawnBase:.030, spawnMax:.058, speedMin:2.2, speedMax:4.8, countBase:8, countMax:22 },
+  easy:   { spawnBase:.020, spawnMax:.035, speedMin:1.0, speedMax:2.0, countBase:6, countMax:14 },
+  medium: { spawnBase:.026, spawnMax:.047, speedMin:1.5, speedMax:3.2, countBase:9, countMax:22 },
+  hard:   { spawnBase:.035, spawnMax:.063, speedMin:2.2, speedMax:4.8, countBase:12, countMax:30 },
 };
 
 // ── DURUM ──────────────────────────────────────────────
@@ -739,7 +741,7 @@ function gameSketch(p){
 
   // Aktif balon sayısı üst limiti
   function getMaxBalloons(){
-    const base=D.countBase+Math.floor(level*1.5);
+    const base=D.countBase+Math.floor(level*2.5);
     return Math.min(base, D.countMax);
   }
 
@@ -784,8 +786,8 @@ function gameSketch(p){
       p.fill(0,0,0,105); p.noStroke(); p.rect(0,0,p.width,p.height);
     }
 
-    // Seviye güncelle — her 35 puanda
-    const newLv=Math.floor(score/35)+1;
+    // Seviye güncelle — her 30 puanda
+    const newLv=Math.floor(score/30)+1;
     if(newLv>level && newLv<=15){
       level=newLv;
       document.getElementById('lv').textContent=level;
@@ -906,8 +908,8 @@ function gameSketch(p){
 
       // Müzik nabız efekti — bass'a göre hafifçe şişip iniyor
       if(bassVal>0){
-        const target=1+p.map(bassVal,0,255,0,.20);
-        this.rMult=p.lerp(this.rMult,target,.18);
+        const target=1+p.map(bassVal,0,255,0,.30);
+        this.rMult=p.lerp(this.rMult,target,.20);
       } else {
         this.rMult=p.lerp(this.rMult,1,.1);
       }
